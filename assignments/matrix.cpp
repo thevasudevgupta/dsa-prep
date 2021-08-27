@@ -1,4 +1,6 @@
 #include <iostream>
+using namespace std;
+
 
 class Node {
     public:
@@ -6,7 +8,7 @@ class Node {
         Node *right;
         Node *down;
         Node() {right = NULL; down = NULL;}
-        void print() {std::cout << data;}
+        void print() {cout << data;}
 };
 
 class Matrix {
@@ -31,7 +33,7 @@ Matrix::Matrix() {
 };
 
 void Matrix::createMatrix(int m, int n) {
-    // std::cout << "##########" << std::endl;
+    // cout << "##########" << std::endl;
 
     num_rows = m, num_columns = n;
     head = NULL;
@@ -42,7 +44,7 @@ void Matrix::createMatrix(int m, int n) {
 
     for (int i = 0; i < num_rows; i++){
         for (int j = 0; j < num_columns; j++) {
-            std::cin >> tmp_value;
+            cin >> tmp_value;
 
             Node *new_node = new Node();
             new_node->data = tmp_value;
@@ -73,39 +75,39 @@ void Matrix::createMatrix(int m, int n) {
         }
         ptr = vertical_ptr->down;
     }
-    // std::cout << "##########" << std::endl;
+    // cout << "##########" << std::endl;
 };
 
 void Matrix::printRowCol() {
-    // std::cout << "##########" << std::endl;
+    // cout << "##########" << std::endl;
     Node *ptr = head;
     Node *vertical_ptr = head;
     for (int i = 0; i < num_rows; i++){
         for (int j = 0; j < num_columns; j++) {
-            std::cout << ptr->data << " ";
+            cout << ptr->data << " ";
             ptr = ptr->right;
         }
         ptr = vertical_ptr->down;
         vertical_ptr = ptr;
-        std::cout << std::endl;
+        cout << std::endl;
     }
-    // std::cout << "##########" << std::endl;
+    // cout << "##########" << std::endl;
 };
 
 void Matrix::printColRow() {
-    // std::cout << "##########" << std::endl;
+    // cout << "##########" << std::endl;
     Node *ptr = head;
     Node *horizontal_ptr = head;
     for (int i = 0; i < num_columns; i++){
         for (int j = 0; j < num_rows; j++) {
-            std::cout << ptr->data << " ";
+            cout << ptr->data << " ";
             ptr = ptr->down;
         }
         ptr = horizontal_ptr->right;
         horizontal_ptr = ptr;
-        std::cout << std::endl;
+        cout << std::endl;
     }
-    // std::cout << "##########" << std::endl;
+    // cout << "##########" << std::endl;
 };
 
 void Matrix::insertRow(int index) {
@@ -119,7 +121,7 @@ void Matrix::insertRow(int index) {
 
     if (index == 0) {
         for (int i = 0; i < num_columns; i++) {
-            std::cin >> tmp_value;
+            cin >> tmp_value;
 
             Node *new_node = new Node();
             new_node->data = tmp_value;
@@ -140,7 +142,7 @@ void Matrix::insertRow(int index) {
         }
 
         for (int i = 0; i < num_columns; i++) {
-            std::cin >> tmp_value;
+            cin >> tmp_value;
 
             Node *new_node = new Node();
             new_node->data = tmp_value;
@@ -170,7 +172,7 @@ void Matrix::insertCol(int index) {
 
     if (index == 0) {
         for (int i = 0; i < num_rows; i++) {
-            std::cin >> tmp_value;
+            cin >> tmp_value;
 
             Node *new_node = new Node();
             new_node->data = tmp_value;
@@ -191,7 +193,7 @@ void Matrix::insertCol(int index) {
         }
 
         for (int i = 0; i < num_rows; i++) {
-            std::cin >> tmp_value;
+            cin >> tmp_value;
 
             Node *new_node = new Node();
             new_node->data = tmp_value;
@@ -239,7 +241,7 @@ void Matrix::delRow(int index) {
 
 void Matrix::delCol(int index) {
     // index is starting from 1
-    // std::cout << "del col at index " << index << std::endl;
+    // cout << "del col at index " << index << std::endl;
     index -= 1;
     num_columns -= 1;
     Node *ptr = head, *obj_to_delete = head;
@@ -276,7 +278,7 @@ int main()
 
     while(true)
     {
-        std::cin>>flag;
+        cin>>flag;
         
         if(flag == -1)
         {
@@ -285,7 +287,7 @@ int main()
         switch(flag)
         {
             case 0:
-                std::cin>>m>>n;
+                cin>>m>>n;
                 M.createMatrix(m,n);
                 break;
             case 1:
@@ -295,19 +297,19 @@ int main()
                 M.printColRow();
                 break;
             case 3:
-                std::cin>>index;
+                cin>>index;
                 M.insertRow(index);
                 break;
             case 4:
-                std::cin>>index;
+                cin>>index;
                 M.insertCol(index);
                 break;
             case 5:
-                std::cin>>index;
+                cin>>index;
                 M.delRow(index);
                 break;
             case 6:
-                std::cin>>index;
+                cin>>index;
                 M.delCol(index);
                 break;
             default:
