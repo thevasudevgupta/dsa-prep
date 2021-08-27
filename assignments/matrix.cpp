@@ -33,6 +33,7 @@ Matrix::Matrix() {
 };
 
 void Matrix::createMatrix(int m, int n) {
+    if (m == 0 || n == 0) {return;}
 
     num_rows = m, num_columns = n;
     head = NULL;
@@ -94,6 +95,7 @@ void Matrix::printRowCol() {
 
 void Matrix::printColRow() {
     if (num_rows == 0 || num_columns == 0) {return;}
+
     Node *ptr = head;
     Node *horizontal_ptr = head;
     for (int i = 0; i < num_columns; i++){
@@ -110,6 +112,7 @@ void Matrix::printColRow() {
 void Matrix::insertRow(int index) {
     // index is starting from 1
     if (num_rows == 0 || num_columns == 0) {return;}
+    if (index > num_rows + 1) {return;}
 
     index -= 1;
     num_rows += 1;
@@ -162,6 +165,7 @@ void Matrix::insertRow(int index) {
 
 void Matrix::insertCol(int index) {
     if (num_rows == 0 || num_columns == 0) {return;}
+    if (index > num_columns + 1) {return;}
 
     // index is starting from 1
     index -= 1;
