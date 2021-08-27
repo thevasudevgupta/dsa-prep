@@ -33,7 +33,6 @@ Matrix::Matrix() {
 };
 
 void Matrix::createMatrix(int m, int n) {
-    // cout << "##########" << std::endl;
 
     num_rows = m, num_columns = n;
     head = NULL;
@@ -75,11 +74,11 @@ void Matrix::createMatrix(int m, int n) {
         }
         ptr = vertical_ptr->down;
     }
-    // cout << "##########" << std::endl;
 };
 
 void Matrix::printRowCol() {
-    // cout << "##########" << std::endl;
+    if (num_rows == 0 || num_columns == 0) {return;}
+
     Node *ptr = head;
     Node *vertical_ptr = head;
     for (int i = 0; i < num_rows; i++){
@@ -91,11 +90,10 @@ void Matrix::printRowCol() {
         vertical_ptr = ptr;
         cout << std::endl;
     }
-    // cout << "##########" << std::endl;
 };
 
 void Matrix::printColRow() {
-    // cout << "##########" << std::endl;
+    if (num_rows == 0 || num_columns == 0) {return;}
     Node *ptr = head;
     Node *horizontal_ptr = head;
     for (int i = 0; i < num_columns; i++){
@@ -107,11 +105,12 @@ void Matrix::printColRow() {
         horizontal_ptr = ptr;
         cout << std::endl;
     }
-    // cout << "##########" << std::endl;
 };
 
 void Matrix::insertRow(int index) {
     // index is starting from 1
+    if (num_rows == 0 || num_columns == 0) {return;}
+
     index -= 1;
     num_rows += 1;
 
@@ -162,6 +161,8 @@ void Matrix::insertRow(int index) {
 };
 
 void Matrix::insertCol(int index) {
+    if (num_rows == 0 || num_columns == 0) {return;}
+
     // index is starting from 1
     index -= 1;
     num_columns += 1;
@@ -213,6 +214,9 @@ void Matrix::insertCol(int index) {
 };
 
 void Matrix::delRow(int index) {
+    if (num_rows == 0 || num_columns == 0) {return;}
+    if (index > num_rows) {return;}
+
     // index is starting from 1
     index -= 1;
     num_rows -= 1;
@@ -240,8 +244,10 @@ void Matrix::delRow(int index) {
 };
 
 void Matrix::delCol(int index) {
+    if (num_rows == 0 || num_columns == 0) {return;}
+    if (index > num_columns) {return;}
+
     // index is starting from 1
-    // cout << "del col at index " << index << std::endl;
     index -= 1;
     num_columns -= 1;
     Node *ptr = head, *obj_to_delete = head;
