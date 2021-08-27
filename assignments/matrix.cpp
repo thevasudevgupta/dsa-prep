@@ -36,8 +36,8 @@ void Matrix::createMatrix(int m, int n) {
     num_rows = m, num_columns = n;
     head = NULL;
 
-    Node *ptr = head, *vertical_ptr = head;
-    Node *above_ptr = head, *above_vertical_ptr = head;
+    Node *ptr = head, *above_ptr = head;
+    Node *vertical_ptr = head;
     int tmp_value;
 
     for (int i = 0; i < num_rows; i++){
@@ -50,31 +50,27 @@ void Matrix::createMatrix(int m, int n) {
             // this is getting executed at start of every new row
             if (ptr == NULL) {
                 if (i == 0) {
-                    head = vertical_ptr = new_node;
+                    vertical_ptr = above_ptr = head = new_node;
+                    ptr = new_node;
                 }
                 else {
-                    vertical_ptr->down = new_node;
-                    vertical_ptr = vertical_ptr->down;
+                    above_ptr->down = ptr = new_node;
+                    above_ptr = above_ptr->right;
                 }
-                ptr = new_node;
             }
             else {
-                // if (i != 0) {
-                //     above_ptr->down = new_node;
-                //     above_ptr = above_ptr->right;
-                // }
                 ptr->right = new_node;
                 ptr = ptr->right;
+                if (i != 0) {
+                    above_ptr->down = new_node;
+                    above_ptr = above_ptr->right;
+                }
             }
         }
-
-        // if (i == 0) {
-        //     above_ptr = above_vertical_ptr = head;
-        // }
-        // else {
-        //     above_ptr = above_vertical_ptr->down;
-        //     above_vertical_ptr = above_vertical_ptr->down;
-        // }
+        if (i != 0) {
+            vertical_ptr = vertical_ptr->down;
+            above_ptr = vertical_ptr;
+        }
         ptr = vertical_ptr->down;
     }
     std::cout << "##########" << std::endl;
