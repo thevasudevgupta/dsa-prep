@@ -31,7 +31,7 @@ Matrix::Matrix() {
 };
 
 void Matrix::createMatrix(int m, int n) {
-    std::cout << "##########" << std::endl;
+    // std::cout << "##########" << std::endl;
 
     num_rows = m, num_columns = n;
     head = NULL;
@@ -73,11 +73,11 @@ void Matrix::createMatrix(int m, int n) {
         }
         ptr = vertical_ptr->down;
     }
-    std::cout << "##########" << std::endl;
+    // std::cout << "##########" << std::endl;
 };
 
 void Matrix::printRowCol() {
-    std::cout << "##########" << std::endl;
+    // std::cout << "##########" << std::endl;
     Node *ptr = head;
     Node *vertical_ptr = head;
     for (int i = 0; i < num_rows; i++){
@@ -89,11 +89,11 @@ void Matrix::printRowCol() {
         vertical_ptr = ptr;
         std::cout << std::endl;
     }
-    std::cout << "##########" << std::endl;
+    // std::cout << "##########" << std::endl;
 };
 
 void Matrix::printColRow() {
-    std::cout << "##########" << std::endl;
+    // std::cout << "##########" << std::endl;
     Node *ptr = head;
     Node *horizontal_ptr = head;
     for (int i = 0; i < num_columns; i++){
@@ -103,22 +103,115 @@ void Matrix::printColRow() {
         }
         ptr = horizontal_ptr->right;
         horizontal_ptr = ptr;
-        // std::cout << "okay" << std::endl;
-        // std::cout << ptr->data << " " << (ptr->down == NULL);
         std::cout << std::endl;
     }
-    std::cout << "##########" << std::endl;
+    // std::cout << "##########" << std::endl;
 };
 
 void Matrix::insertRow(int index) {
+    // index is starting from 1
+    index -= 1;
+    num_rows += 1;
+
+    Node *ptr = head;
+    Node *horizontal_ptr;
+    int tmp_value;
+
+    if (index == 0) {
+        for (int i = 0; i < num_columns; i++) {
+            std::cin >> tmp_value;
+
+            Node *new_node = new Node();
+            new_node->data = tmp_value;
+
+            if (i == 0) {head = horizontal_ptr = new_node;}
+            else {
+                horizontal_ptr->right = new_node;
+                horizontal_ptr = horizontal_ptr->right;
+            }
+
+            new_node->down = ptr;
+            ptr = ptr->right;
+        }        
+    }
+    else {
+        for (int i = 0; i < index - 1; i++) {
+            ptr = ptr->down;
+        }
+
+        for (int i = 0; i < num_columns; i++) {
+            std::cin >> tmp_value;
+
+            Node *new_node = new Node();
+            new_node->data = tmp_value;
+
+            if (i == 0) {horizontal_ptr = new_node;}
+            else {
+                horizontal_ptr->right = new_node;
+                horizontal_ptr = horizontal_ptr->right;
+            }
+
+            new_node->down = ptr->down;
+            ptr->down = new_node;
+
+            ptr = ptr->right;
+        }
+    }
 };
 
 void Matrix::insertCol(int index) {
+    // index is starting from 1
+    index -= 1;
+    num_columns += 1;
+
+    Node *ptr = head;
+    Node *vertical_ptr;
+    int tmp_value;
+
+    if (index == 0) {
+        for (int i = 0; i < num_rows; i++) {
+            std::cin >> tmp_value;
+
+            Node *new_node = new Node();
+            new_node->data = tmp_value;
+
+            if (i == 0) {head = vertical_ptr = new_node;}
+            else {
+                vertical_ptr->down = new_node;
+                vertical_ptr = vertical_ptr->down;
+            }
+
+            new_node->right = ptr;
+            ptr = ptr->down;
+        }
+    }
+    else {
+        for (int i = 0; i < index - 1; i++) {
+            ptr = ptr->right;
+        }
+
+        for (int i = 0; i < num_rows; i++) {
+            std::cin >> tmp_value;
+
+            Node *new_node = new Node();
+            new_node->data = tmp_value;
+
+            if (i == 0) {vertical_ptr = new_node;}
+            else {
+                vertical_ptr->down = new_node;
+                vertical_ptr = vertical_ptr->down;
+            }
+
+            new_node->right = ptr->right;
+            ptr->right = new_node;
+
+            ptr = ptr->down;
+        }
+    }
 };
 
 void Matrix::delRow(int index) {
     // index is starting from 1
-    std::cout << "del row at index " << index << std::endl;
     index -= 1;
     num_rows -= 1;
     Node *ptr = head, *obj_to_delete = head;
@@ -138,8 +231,6 @@ void Matrix::delRow(int index) {
         for (int i = 0; i < num_columns; i++) {
             obj_to_delete = ptr->down;
             ptr->down = ptr->down->down;
-            // if (obj_to_delete != NULL) {std::cout << obj_to_delete->data << std::endl;}
-            // else {std::cout << "NULL" << std::endl;}
             free(obj_to_delete);
             ptr = ptr->right;
         }
@@ -148,7 +239,7 @@ void Matrix::delRow(int index) {
 
 void Matrix::delCol(int index) {
     // index is starting from 1
-    std::cout << "del col at index " << index << std::endl;
+    // std::cout << "del col at index " << index << std::endl;
     index -= 1;
     num_columns -= 1;
     Node *ptr = head, *obj_to_delete = head;
@@ -168,8 +259,6 @@ void Matrix::delCol(int index) {
         for (int i = 0; i < num_rows; i++) {
             obj_to_delete = ptr->right;
             ptr->right = ptr->right->right;
-            // if (obj_to_delete != NULL) {std::cout << obj_to_delete->data << std::endl;}
-            // else {std::cout << "NULL" << std::endl;}
             free(obj_to_delete);
             ptr = ptr->down;
         }
