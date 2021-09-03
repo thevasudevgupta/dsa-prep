@@ -1,8 +1,9 @@
 # Data Structures & Algorithms
 
+* [x] [NPTEL DSA YouTube](https://www.youtube.com/playlist?app=desktop&list=PLyqSpQzTE6M_Fu6l8irVwXkUyC9Gwqr6_)
+* [ ] [algoexpert.io](https://www.algoexpert.io/product)
 * [ ] [CS2700 course page](https://www.cse.iitm.ac.in/~rupesh/teaching/pds/aug21/)
 * [ ] [CS2810 course page](https://www.cse.iitm.ac.in/~rupesh/teaching/ooaia/jan20/)
-* [ ] [algoexpert.io](https://www.algoexpert.io/product)
 
 ### CS2700 assignments
 
