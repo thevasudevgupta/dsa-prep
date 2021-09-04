@@ -1,4 +1,5 @@
 #include <iostream>
+#include <stack>
 
 class Node {
     public:
@@ -14,10 +15,13 @@ class List {
         void remove(int value);
         void print();
         int size();
+        int CountNode();
+        bool is_zpalindrome(int *);
         List() {head = NULL; tail=NULL; length = 0;}
     private:
         Node *head, *tail;
         int length;
+        int CountNode(Node *head);
 };
 
 void List::insert(int value) {
@@ -80,6 +84,42 @@ int List::size() {
     return length;
 };
 
+int List::CountNode() {
+	return CountNode(head);
+};
+
+int List::CountNode(Node *head) {
+        if (head == NULL)
+            return 0;
+        return 1 + CountNode(head->next);
+};
+
+bool List::is_zpalindrome(int *z) {
+    if (length % 2 == 0) { return false; }
+
+	std::stack<char> stack;
+    Node *ptr = head; int z_counter = 0;
+	while (ptr != NULL) {
+		if (ptr->data == *z) {
+			z_counter++;
+		}
+		stack.push(ptr->data);
+		std::cout << ptr->data << std::endl;
+		ptr = ptr->next;
+	}
+
+	if (z_counter != 1) { return false; }
+
+	ptr = head;
+	while (ptr != NULL) {
+		if (stack.top() != ptr->data) { return false; }
+		stack.pop();
+		ptr = ptr->next;
+	}
+
+	return true;
+};
+
 
 int main() {
     List list;
@@ -87,13 +127,17 @@ int main() {
     list.insert(3);
     list.insert(4);
     list.insert(7);
-    list.insert(3);
-    list.insert(5);
-    list.insert(8);
+    list.insert(6);
+    list.insert(7);
+    list.insert(4);
     list.insert(3);
 
     list.print();
     std::cout << "size: " << list.size() << std::endl;
+
+    int x = 6;
+    bool is_zpalindrome = list.is_zpalindrome(&x);
+    std::cout << "is_zpalindrome: " << is_zpalindrome << std::endl;
 
     list.remove(3);
     list.remove(9);
