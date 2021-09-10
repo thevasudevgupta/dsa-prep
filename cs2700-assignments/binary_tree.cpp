@@ -43,6 +43,7 @@ int main() {
             char s;
             cin >> s;
             // your code goes here
+        }
         if (operation==3) {
             char s;
             cin >> s;
@@ -63,6 +64,5 @@ int main() {
             //your code goes here
             cout << endl;
         }
-    }
     return 0;
 }
