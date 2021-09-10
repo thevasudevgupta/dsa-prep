@@ -1,3 +1,5 @@
+// g++ binary_tree.cpp && ./a.out <sample.txt
+
 #include <iostream>
 #include <vector>
 using namespace std;
@@ -38,31 +40,37 @@ int main() {
             } else {
             // your code goes here
             }
+            cout << "doing operation-" << operation << endl;
         }
-        if (operation==2) {
+        if (operation == 2) {
             char s;
             cin >> s;
             // your code goes here
+            cout << "doing operation-" << operation << endl;
         }
-        if (operation==3) {
+        if (operation == 3) {
             char s;
             cin >> s;
             int count  = 0;
             // your code goes here
+            cout << "doing operation-" << operation << endl;
             cout << count << endl;    
         }
-        if (operation==4) {
+        if (operation == 4) {
             int target;
             cin >> target;
             int leaf=0, non_leaf=0;
             // your code goes here
+            cout << "doing operation-" << operation << endl;
             cout << leaf << " " << non_leaf << endl;    
         }
-        if (operation==5) {
+        if (operation == 5) {
             int target;
             cin >> target;
             //your code goes here
+            cout << "doing operation-" << operation << endl;
             cout << endl;
         }
+    }
     return 0;
 }
