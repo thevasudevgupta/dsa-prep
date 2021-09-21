@@ -47,8 +47,9 @@ class Tree {
         void conditional_print(int target);
         TreeNode *find_insert_location();
         int search(char target);
-        Tree() {root = NULL;}
         vector<int> count_conditional_leaf_nonleaf(int target);
+        void deallocate_node(char target);
+        Tree() {root = NULL;}
     private:
         TreeNode *root;
         void preorder_print(TreeNode *ptr);
@@ -124,7 +125,7 @@ void Tree::conditional_print(int target) {
 }
 
 TreeNode *Tree::find_insert_location() {
-    if (root->value == -1) { cerr << "Some error in find_insert_location" << endl; }
+    if (root->value == -1) { cerr << "Some error in find_insert_location (inital)" << endl; }
 
     queue<TreeNode *> q;
     q.push(root);
@@ -149,15 +150,12 @@ TreeNode *Tree::find_insert_location() {
 
 int Tree::search(char target) {
     int count = 0;
-    // cout << *count << endl;
     search(root, target, &count);
     return count;
 }
 
 void Tree::search(TreeNode *ptr, char target, int *count) {
     if (ptr == NULL) { return; }
-    // cout << target << " " << ptr->name << " " << (ptr->name == target) << endl;
-    // cout << target << " " << ptr->name << endl;
     if (target == ptr->name) { (*count)++; }
     search(ptr->left, target, count);
     search(ptr->right, target, count);
@@ -178,16 +176,63 @@ void Tree::count_conditional_leaf_nonleaf(TreeNode *ptr, int target, int *leaf_c
     count_conditional_leaf_nonleaf(ptr->right, target, leaf_count, non_leaf_count);
 }
 
-// int main() {
-//     vector<int> values{1, 2, 3, 4, 5, 6, 7};
-//     vector<const char*> names{"c", "k", "m", "N", "c", "h", "c"};
-//     cout << endl;
+void Tree::deallocate_node(char target) {
+    if (root == NULL) { return; }
 
-//     Tree tree;
-//     tree.create_tree(names, values);
-//     cout << "printing Tree" << endl;
-//     tree.preorder_print();
-// }
+    queue<TreeNode *> parent_q;
+    parent_q.push(root);
+
+    queue<TreeNode *> delete_ptr_q;
+
+    while (!parent_q.empty()) {
+        TreeNode *left_child = parent_q.front()->left, *right_child = parent_q.front()->right;
+
+        if (left_child != NULL) {
+            // need to think few special cases
+            if (!delete_ptr_q.empty() && left_child->is_leaf() && left_child->name != target) {
+                swap(delete_ptr_q.front()->name, left_child->name);
+                swap(delete_ptr_q.front()->value, left_child->value);
+                delete_ptr_q.pop();
+            }
+            if (left_child->name == target && left_child->is_leaf()) {
+                // parent_q.front()->left = NULL;
+                // delete left_child;
+                left_child->name = 'N';
+                left_child->value = -1;
+            }
+            else if (left_child->name == target) {
+                delete_ptr_q.push(left_child);
+                parent_q.push(left_child);
+            }
+            else {
+                parent_q.push(left_child);
+            }
+        }
+        if (right_child != NULL) {
+            if (!delete_ptr_q.empty() && right_child->is_leaf() && right_child->name != target) {
+                swap(delete_ptr_q.front()->name, right_child->name);
+                swap(delete_ptr_q.front()->value, right_child->value);
+                delete_ptr_q.pop();
+            }
+            if (right_child->name == target && right_child->is_leaf()) {
+                // parent_q.front()->right = NULL;
+                // delete right_child;
+                right_child->name = 'N';
+                right_child->value = -1;
+            }
+            else if (right_child->name == target) {
+                delete_ptr_q.push(right_child);
+                parent_q.push(right_child);
+            }
+            else {
+                parent_q.push(right_child);
+            }
+        }
+        parent_q.pop();
+    }
+    if (!delete_ptr_q.empty()) { cerr << "some error in deleting" << endl; }
+}
+
 
 int main() {
     int T;
@@ -198,7 +243,7 @@ int main() {
         int operation;
         cin >> operation;
         if (operation == 1) {
-            cout << "FOR INSERTION" << endl;
+            // cout << "FOR INSERTION" << endl;
             int n;
             cin >> n;
             vector<int> values(n, -1);
@@ -227,19 +272,26 @@ int main() {
             // cout << "################" << endl;
         }
         if (operation == 2) {
-            cout << "FOR DELETION" << endl;
-            char s;
-            cin >> s;
+            // cout << "FOR DELETION" << endl;
+            char target;
+            cin >> target;
+            // cout << "###### BEFORE ########" << endl;
+            // tree.level_wise_print();
+            // cout << "################" << endl;
+            tree.deallocate_node(target);
+            // cout << "####### AFTER ########" << endl;
+            // tree.level_wise_print();
+            // cout << "################" << endl;
         }
         if (operation == 3) {
-            cout << "FOR SEARCH" << endl;
+            // cout << "FOR SEARCH" << endl;
             char target;
             cin >> target;
             int count = tree.search(target);
             cout << count << endl;    
         }
         if (operation == 4) {
-            cout << "FOR COUNTING LEAF/NON_LEAF" << endl;
+            // cout << "FOR COUNTING LEAF/NON_LEAF" << endl;
             int target;
             cin >> target;
             vector<int> count = tree.count_conditional_leaf_nonleaf(target);
@@ -249,6 +301,7 @@ int main() {
             cout << "FOR PRINT" << endl;
             int target;
             cin >> target;
+            cout << "target: " << target << endl;
             tree.conditional_print(target);
         }
     }
