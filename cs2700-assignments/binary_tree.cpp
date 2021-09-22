@@ -13,7 +13,6 @@ class TreeNode {
         char name;
         int value;
         TreeNode(char name, int val);
-        void insert(TreeNode *node);
         void print();
         bool is_leaf();
 };
@@ -28,12 +27,6 @@ void TreeNode::print() {
     cout << name << "->" << value << endl;
 };
 
-void TreeNode::insert(TreeNode *node) {
-    if (left->value == -1) { left = node; }
-    else if (right->value == -1) {right = node; }
-    else {std::cerr << "You can't insert here" << endl; } 
-}
-
 bool TreeNode::is_leaf() {
     return (left == NULL && right == NULL);
 }
@@ -45,10 +38,10 @@ class Tree {
         void preorder_print();
         void level_wise_print();
         void conditional_print(int target);
-        TreeNode *find_insert_location();
+        void insert(TreeNode *node);
         int search(char target);
         vector<int> count_conditional_leaf_nonleaf(int target);
-        void deallocate_node(char target);
+        void delete_node(char target);
         Tree() {root = NULL;}
     private:
         TreeNode *root;
@@ -77,8 +70,36 @@ TreeNode *Tree::create_tree(vector<char> names, vector<int> values) {
             q.push(new_node);
         }
     }
+
+    queue<TreeNode *> new_q;
+    new_q.push(root);
+    TreeNode *tmp_ptr = NULL;
+    while (!new_q.empty()) {
+        TreeNode *q_front = new_q.front();
+
+        if (q_front->left != NULL) {
+            if (q_front->left->value == -1) {
+                tmp_ptr = q_front->left;
+                q_front->left = NULL;
+                delete tmp_ptr;
+            }
+            else { new_q.push(q_front->left); }
+        }
+
+        if (q_front->right != NULL) {
+            if (q_front->right->value == -1) {
+                tmp_ptr = q_front->right;
+                q_front->right = NULL;
+                delete tmp_ptr;
+            }
+            else { new_q.push(q_front->right); }
+        }
+
+        new_q.pop();
+    }
     return root;
 };
+
 
 void Tree::preorder_print() {
     preorder_print(root);
@@ -124,8 +145,10 @@ void Tree::conditional_print(int target) {
     cout << endl;
 }
 
-TreeNode *Tree::find_insert_location() {
-    if (root->value == -1) { cerr << "Some error in find_insert_location (inital)" << endl; }
+void Tree::insert(TreeNode *node) {
+    if (root == NULL) {
+        cerr << "Some error in find_insert_location (inital)" << endl;
+    }
 
     queue<TreeNode *> q;
     q.push(root);
@@ -133,19 +156,13 @@ TreeNode *Tree::find_insert_location() {
     while (!q.empty()) {
         TreeNode *q_front = q.front();
 
-        if (q_front->left != NULL) {
-            if (q_front->left->value == -1) { return q_front; }
-            q.push(q_front->left);
-        }
-        if (q_front->right != NULL) {
-            if (q_front->right->value == -1) { return q_front; }
-            q.push(q_front->right);
-        }
+        if (q_front->left == NULL) { q_front->left = node; return; }
+        else { q.push(q_front->left); }
+
+        if (q_front->right == NULL) { q_front->right = node; return; }
+        else { q.push(q_front->right); }
         q.pop();
     }
-
-    cerr << "Some error in find_insert_location" << endl;
-    return root;
 };
 
 int Tree::search(char target) {
@@ -176,7 +193,7 @@ void Tree::count_conditional_leaf_nonleaf(TreeNode *ptr, int target, int *leaf_c
     count_conditional_leaf_nonleaf(ptr->right, target, leaf_count, non_leaf_count);
 }
 
-void Tree::deallocate_node(char target) {
+void Tree::delete_node(char target) {
     if (root == NULL) { return; }
 
     queue<TreeNode *> parent_q;
@@ -188,17 +205,14 @@ void Tree::deallocate_node(char target) {
         TreeNode *left_child = parent_q.front()->left, *right_child = parent_q.front()->right;
 
         if (left_child != NULL) {
-            // need to think few special cases
             if (!delete_ptr_q.empty() && left_child->is_leaf() && left_child->name != target) {
                 swap(delete_ptr_q.front()->name, left_child->name);
                 swap(delete_ptr_q.front()->value, left_child->value);
                 delete_ptr_q.pop();
             }
             if (left_child->name == target && left_child->is_leaf()) {
-                // parent_q.front()->left = NULL;
-                // delete left_child;
-                left_child->name = 'N';
-                left_child->value = -1;
+                parent_q.front()->left = NULL;
+                delete left_child;
             }
             else if (left_child->name == target) {
                 delete_ptr_q.push(left_child);
@@ -215,10 +229,8 @@ void Tree::deallocate_node(char target) {
                 delete_ptr_q.pop();
             }
             if (right_child->name == target && right_child->is_leaf()) {
-                // parent_q.front()->right = NULL;
-                // delete right_child;
-                right_child->name = 'N';
-                right_child->value = -1;
+                parent_q.front()->right = NULL;
+                delete right_child;
             }
             else if (right_child->name == target) {
                 delete_ptr_q.push(right_child);
@@ -257,17 +269,14 @@ int main() {
                 names.push_back(c);
             }
             if (root != NULL) {
-                Tree new_tree; TreeNode *new_root, *insert_location;
-                new_root = new_tree.create_tree(names, values);
-
-                insert_location = tree.find_insert_location();
-                if (insert_location == NULL) { cerr << "some issue here"; }
-                // insert_location->print();
-                insert_location->insert(new_root);
+                Tree new_tree;
+                TreeNode *new_root = new_tree.create_tree(names, values);
+                tree.insert(new_root);
 
             } else { root = tree.create_tree(names, values); }
             // cout << "################" << endl;
             // tree.level_wise_print();
+            // cout << "####" << endl;
             // tree.preorder_print();
             // cout << "################" << endl;
         }
@@ -278,7 +287,7 @@ int main() {
             // cout << "###### BEFORE ########" << endl;
             // tree.level_wise_print();
             // cout << "################" << endl;
-            tree.deallocate_node(target);
+            tree.delete_node(target);
             // cout << "####### AFTER ########" << endl;
             // tree.level_wise_print();
             // cout << "################" << endl;
@@ -298,10 +307,10 @@ int main() {
             cout << count[0] << " " << count[1] << endl;    
         }
         if (operation == 5) {
-            cout << "FOR PRINT" << endl;
+            // cout << "FOR PRINT" << endl;
             int target;
             cin >> target;
-            cout << "target: " << target << endl;
+            // cout << "target: " << target << endl;
             tree.conditional_print(target);
         }
     }
