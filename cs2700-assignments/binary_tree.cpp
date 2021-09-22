@@ -53,7 +53,8 @@ class Tree {
 
 TreeNode *Tree::create_tree(vector<char> names, vector<int> values) {
     queue<TreeNode *> q;
-    for (int i = 0; i < values.size(); i++) {
+    int size = values.size();
+    for (int i = 0; i < size; i++) {
         TreeNode *new_node = new TreeNode(names[i], values[i]);
         if (root == NULL) { root = new_node; }
         if (!q.empty()) {
@@ -194,55 +195,68 @@ void Tree::count_conditional_leaf_nonleaf(TreeNode *ptr, int target, int *leaf_c
 }
 
 void Tree::delete_node(char target) {
-    if (root == NULL) { return; }
+    queue<TreeNode *> q, replaced_q, leaves_q;
+    q.push(root);
+    int c1 = 0, c2 = 0;
+    TreeNode *ptr;
 
-    queue<TreeNode *> parent_q;
-    parent_q.push(root);
+    while (!q.empty()) {
 
-    queue<TreeNode *> delete_ptr_q;
-
-    while (!parent_q.empty()) {
-        TreeNode *left_child = parent_q.front()->left, *right_child = parent_q.front()->right;
-
-        if (left_child != NULL) {
-            if (!delete_ptr_q.empty() && left_child->is_leaf() && left_child->name != target) {
-                swap(delete_ptr_q.front()->name, left_child->name);
-                swap(delete_ptr_q.front()->value, left_child->value);
-                delete_ptr_q.pop();
+        // left nodes
+        ptr = q.front()->left;
+        if (ptr != NULL) {
+            if (ptr->name == target) {
+                if (ptr->is_leaf()) {
+                    q.front()->left = NULL;
+                    delete ptr;
+                }
+                else {
+                    replaced_q.push(ptr);
+                    c1++;
+                    q.push(ptr);
+                }
             }
-            if (left_child->name == target && left_child->is_leaf()) {
-                parent_q.front()->left = NULL;
-                delete left_child;
+            else if (ptr->is_leaf() && c1 != c2) {
+                leaves_q.push(ptr);
+                c2++;
+                q.front()->left = NULL;
             }
-            else if (left_child->name == target) {
-                delete_ptr_q.push(left_child);
-                parent_q.push(left_child);
-            }
-            else {
-                parent_q.push(left_child);
-            }
+            else { q.push(ptr); }
         }
-        if (right_child != NULL) {
-            if (!delete_ptr_q.empty() && right_child->is_leaf() && right_child->name != target) {
-                swap(delete_ptr_q.front()->name, right_child->name);
-                swap(delete_ptr_q.front()->value, right_child->value);
-                delete_ptr_q.pop();
+
+        // similarly for right nodes
+        ptr = q.front()->right;
+        if (ptr != NULL) {
+            if (ptr->name == target) {
+                if (ptr->is_leaf()) {
+                    q.front()->right = NULL;
+                    delete ptr;
+                }
+                else {
+                    replaced_q.push(ptr);
+                    c1++;
+                    q.push(ptr);
+                }
             }
-            if (right_child->name == target && right_child->is_leaf()) {
-                parent_q.front()->right = NULL;
-                delete right_child;
+            else if (ptr->is_leaf() && c1 != c2) {
+                leaves_q.push(ptr);
+                c2++;
+                q.front()->right = NULL;
             }
-            else if (right_child->name == target) {
-                delete_ptr_q.push(right_child);
-                parent_q.push(right_child);
-            }
-            else {
-                parent_q.push(right_child);
-            }
+            else { q.push(ptr); }
         }
-        parent_q.pop();
+
+        q.pop();
     }
-    if (!delete_ptr_q.empty()) { cerr << "some error in deleting" << endl; }
+
+    if (c1 != c2) { cerr<<"leaves count is not equal to delete nodes"<<endl; }
+    while (!replaced_q.empty()) {
+        swap(replaced_q.front()->name, leaves_q.front()->name);
+        swap(replaced_q.front()->value, leaves_q.front()->value);
+
+        // delete leaves_q.front();
+        replaced_q.pop(); leaves_q.pop();
+    }
 }
 
 
@@ -272,8 +286,9 @@ int main() {
                 Tree new_tree;
                 TreeNode *new_root = new_tree.create_tree(names, values);
                 tree.insert(new_root);
-
-            } else { root = tree.create_tree(names, values); }
+            } else {
+                root = tree.create_tree(names, values);
+            }
             // cout << "################" << endl;
             // tree.level_wise_print();
             // cout << "####" << endl;
