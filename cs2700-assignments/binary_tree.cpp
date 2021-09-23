@@ -155,13 +155,11 @@ void Tree::insert(TreeNode *node) {
     q.push(root);
 
     while (!q.empty()) {
-        TreeNode *q_front = q.front();
+        if (q.front()->left == NULL) { q.front()->left = node; break; }
+        else { q.push(q.front()->left); }
 
-        if (q_front->left == NULL) { q_front->left = node; return; }
-        else { q.push(q_front->left); }
-
-        if (q_front->right == NULL) { q_front->right = node; return; }
-        else { q.push(q_front->right); }
+        if (q.front()->right == NULL) { q.front()->right = node; break; }
+        else { q.push(q.front()->right); }
         q.pop();
     }
 };
@@ -202,7 +200,7 @@ void Tree::delete_node(char target) {
 
     while (!q.empty()) {
 
-        // left nodes
+        // left node
         ptr = q.front()->left;
         if (ptr != NULL) {
             if (ptr->name == target) {
@@ -211,13 +209,13 @@ void Tree::delete_node(char target) {
                     delete ptr;
                 }
                 else {
-                    replaced_q.push(ptr);
+                    replaced_q.push(q.front()->left);
                     c1++;
-                    q.push(ptr);
+                    q.push(q.front()->left);
                 }
             }
             else if (ptr->is_leaf() && c1 != c2) {
-                leaves_q.push(ptr);
+                leaves_q.push(q.front()->left);
                 c2++;
                 q.front()->left = NULL;
             }
@@ -233,13 +231,13 @@ void Tree::delete_node(char target) {
                     delete ptr;
                 }
                 else {
-                    replaced_q.push(ptr);
+                    replaced_q.push(q.front()->right);
                     c1++;
-                    q.push(ptr);
+                    q.push(q.front()->right);
                 }
             }
             else if (ptr->is_leaf() && c1 != c2) {
-                leaves_q.push(ptr);
+                leaves_q.push(q.front()->right);
                 c2++;
                 q.front()->right = NULL;
             }
@@ -250,15 +248,50 @@ void Tree::delete_node(char target) {
     }
 
     if (c1 != c2) { cerr<<"leaves count is not equal to delete nodes"<<endl; }
-    while (!replaced_q.empty()) {
-        swap(replaced_q.front()->name, leaves_q.front()->name);
-        swap(replaced_q.front()->value, leaves_q.front()->value);
+    while (!replaced_q.empty() && !leaves_q.empty()) {
+        replaced_q.front()->name = leaves_q.front()->name;
+        replaced_q.front()->value = leaves_q.front()->value;
 
-        // delete leaves_q.front();
+        delete leaves_q.front();
         replaced_q.pop(); leaves_q.pop();
     }
-}
 
+    if (!q.empty()) { cerr<<"why q is not empty? 2"<<endl;}
+
+    q.push(root);
+    while (!q.empty()) {
+
+        ptr = q.front()->left;
+        if (ptr != NULL) {
+            if (ptr->name == target) {
+                if (ptr->is_leaf()) {
+                    cerr << "bug1" << endl;
+                }
+                else {
+                    cerr << "bug2" << endl;
+                }
+            }
+            else { q.push(ptr); }
+        }
+
+        // similarly for right nodes
+        ptr = q.front()->right;
+        if (ptr != NULL) {
+            if (ptr->name == target) {
+                if (ptr->is_leaf()) {
+                    cerr << "bug3" << endl;
+                }
+                else {
+                    cerr << "bug4" << endl;
+                }
+            }
+            else { q.push(ptr); }
+        }
+
+        q.pop();
+    }
+
+}
 
 int main() {
     int T;
