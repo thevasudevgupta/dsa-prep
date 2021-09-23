@@ -192,15 +192,41 @@ void Tree::count_conditional_leaf_nonleaf(TreeNode *ptr, int target, int *leaf_c
     count_conditional_leaf_nonleaf(ptr->right, target, leaf_count, non_leaf_count);
 }
 
+
 void Tree::delete_node(char target) {
-    queue<TreeNode *> q, replaced_q, leaves_q;
-    q.push(root);
-    int c1 = 0, c2 = 0;
+    queue<TreeNode *> q, leaves_q, parent_q;
     TreeNode *ptr;
 
-    while (!q.empty()) {
+    // cout << "passing-1" << endl;
+    if ( !q.empty()) { cerr<<"P1: why q is not empty?"<<endl; }
 
-        // left node
+    // saving pointers of all the leaves
+    q.push(root);
+    while (!q.empty()) {
+        ptr = q.front()->left;
+        if (ptr != NULL) {
+            if (ptr->name != target && ptr->is_leaf()) {
+                leaves_q.push(q.front()->left);
+                parent_q.push(q.front());
+            }
+            else { q.push(q.front()->left); }
+        }
+        ptr = q.front()->right;
+        if (ptr != NULL) {
+            if (ptr->name != target && ptr->is_leaf()) {
+                leaves_q.push(q.front()->right);
+                parent_q.push(q.front());
+            }
+            else { q.push(q.front()->right); }
+        }
+        q.pop();
+    }
+
+    if ( !q.empty()) { cerr<<"P1: why q is not empty?"<<endl; }
+    // cout << "passing-2" << endl;
+
+    q.push(root);
+    while (!q.empty()) {
         ptr = q.front()->left;
         if (ptr != NULL) {
             if (ptr->name == target) {
@@ -208,21 +234,23 @@ void Tree::delete_node(char target) {
                     q.front()->left = NULL;
                     delete ptr;
                 }
-                else {
-                    replaced_q.push(q.front()->left);
-                    c1++;
+                else {                 
+                    if (leaves_q.empty()) {cout<<"here is issue-1"<<endl;}   
+                    q.front()->left->name = leaves_q.front()->name;
+                    q.front()->left->value = leaves_q.front()->value;
+                    if (parent_q.front()->left == leaves_q.front()) {
+                        parent_q.front()->left = NULL;
+                    }
+                    else if (parent_q.front()->right == leaves_q.front()) {
+                        parent_q.front()->right = NULL;
+                    }
+                    else { cerr<<"buggy1"<<endl;}
+                    leaves_q.pop(); parent_q.pop();
                     q.push(q.front()->left);
                 }
             }
-            else if (ptr->is_leaf() && c1 != c2) {
-                leaves_q.push(q.front()->left);
-                c2++;
-                q.front()->left = NULL;
-            }
             else { q.push(ptr); }
         }
-
-        // similarly for right nodes
         ptr = q.front()->right;
         if (ptr != NULL) {
             if (ptr->name == target) {
@@ -231,36 +259,30 @@ void Tree::delete_node(char target) {
                     delete ptr;
                 }
                 else {
-                    replaced_q.push(q.front()->right);
-                    c1++;
+                    if (leaves_q.empty()) {cout<<"here is issue-2"<<endl;}
+                    q.front()->right->name = leaves_q.front()->name;
+                    q.front()->right->value = leaves_q.front()->value;
+                    if (parent_q.front()->left == leaves_q.front()) {
+                        parent_q.front()->left = NULL;
+                    }
+                    else if (parent_q.front()->right == leaves_q.front()) {
+                        parent_q.front()->right = NULL;
+                    }
+                    else { cerr<<"buggy2"<<endl;}
+                    leaves_q.pop(); parent_q.pop();
                     q.push(q.front()->right);
                 }
             }
-            else if (ptr->is_leaf() && c1 != c2) {
-                leaves_q.push(q.front()->right);
-                c2++;
-                q.front()->right = NULL;
-            }
             else { q.push(ptr); }
         }
-
         q.pop();
     }
 
-    if (c1 != c2) { cerr<<"leaves count is not equal to delete nodes"<<endl; }
-    while (!replaced_q.empty() && !leaves_q.empty()) {
-        replaced_q.front()->name = leaves_q.front()->name;
-        replaced_q.front()->value = leaves_q.front()->value;
-
-        delete leaves_q.front();
-        replaced_q.pop(); leaves_q.pop();
-    }
-
-    if (!q.empty()) { cerr<<"why q is not empty? 2"<<endl;}
+    // cout << "passing-3" << endl;
+    if (!q.empty()) { cerr<<"P2: why q is not empty?"<<endl; }
 
     q.push(root);
     while (!q.empty()) {
-
         ptr = q.front()->left;
         if (ptr != NULL) {
             if (ptr->name == target) {
@@ -273,8 +295,6 @@ void Tree::delete_node(char target) {
             }
             else { q.push(ptr); }
         }
-
-        // similarly for right nodes
         ptr = q.front()->right;
         if (ptr != NULL) {
             if (ptr->name == target) {
@@ -287,7 +307,6 @@ void Tree::delete_node(char target) {
             }
             else { q.push(ptr); }
         }
-
         q.pop();
     }
 
