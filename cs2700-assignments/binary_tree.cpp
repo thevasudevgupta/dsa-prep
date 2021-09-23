@@ -193,37 +193,43 @@ void Tree::count_conditional_leaf_nonleaf(TreeNode *ptr, int target, int *leaf_c
 }
 
 
-void Tree::delete_node(char target) {
-    queue<TreeNode *> q, leaves_q, parent_q;
+TreeNode *find_leaf_node(TreeNode *root, char target) {
+    queue<TreeNode *> q;
     TreeNode *ptr;
 
-    // cout << "passing-1" << endl;
-    if ( !q.empty()) { cerr<<"P1: why q is not empty?"<<endl; }
-
-    // saving pointers of all the leaves
     q.push(root);
     while (!q.empty()) {
         ptr = q.front()->left;
         if (ptr != NULL) {
             if (ptr->name != target && ptr->is_leaf()) {
-                leaves_q.push(q.front()->left);
-                parent_q.push(q.front());
+                ptr = q.front()->left;
+                q.front()->left = NULL;
+                return ptr;
             }
             else { q.push(q.front()->left); }
         }
         ptr = q.front()->right;
         if (ptr != NULL) {
             if (ptr->name != target && ptr->is_leaf()) {
-                leaves_q.push(q.front()->right);
-                parent_q.push(q.front());
+                ptr = q.front()->right;
+                q.front()->right = NULL;
+                return ptr;
             }
             else { q.push(q.front()->right); }
         }
         q.pop();
     }
 
+    cerr<<"no leaf node!!!"<<endl;
+    return root;
+}
+
+void Tree::delete_node(char target) {
+    queue<TreeNode *> q;
+    TreeNode *ptr;
+
+    // cout << "passing-1" << endl;
     if ( !q.empty()) { cerr<<"P1: why q is not empty?"<<endl; }
-    // cout << "passing-2" << endl;
 
     q.push(root);
     while (!q.empty()) {
@@ -235,17 +241,18 @@ void Tree::delete_node(char target) {
                     delete ptr;
                 }
                 else {                 
-                    if (leaves_q.empty()) {cout<<"here is issue-1"<<endl;}   
-                    q.front()->left->name = leaves_q.front()->name;
-                    q.front()->left->value = leaves_q.front()->value;
-                    if (parent_q.front()->left == leaves_q.front()) {
-                        parent_q.front()->left = NULL;
-                    }
-                    else if (parent_q.front()->right == leaves_q.front()) {
-                        parent_q.front()->right = NULL;
-                    }
-                    else { cerr<<"buggy1"<<endl;}
-                    leaves_q.pop(); parent_q.pop();
+                    // if (leaves_q.empty()) {cout<<"here is issue-1"<<endl;}
+                    TreeNode *leaf = find_leaf_node(root, target);
+                    q.front()->left->name = leaf->name;
+                    q.front()->left->value = leaf->value;
+                    // if (parent_q.front()->left == leaves_q.front()) {
+                    //     parent_q.front()->left = NULL;
+                    // }
+                    // else if (parent_q.front()->right == leaves_q.front()) {
+                    //     parent_q.front()->right = NULL;
+                    // }
+                    // else { cerr<<"buggy1"<<endl;}
+                    // leaves_q.pop(); parent_q.pop();
                     q.push(q.front()->left);
                 }
             }
@@ -259,17 +266,21 @@ void Tree::delete_node(char target) {
                     delete ptr;
                 }
                 else {
-                    if (leaves_q.empty()) {cout<<"here is issue-2"<<endl;}
-                    q.front()->right->name = leaves_q.front()->name;
-                    q.front()->right->value = leaves_q.front()->value;
-                    if (parent_q.front()->left == leaves_q.front()) {
-                        parent_q.front()->left = NULL;
-                    }
-                    else if (parent_q.front()->right == leaves_q.front()) {
-                        parent_q.front()->right = NULL;
-                    }
-                    else { cerr<<"buggy2"<<endl;}
-                    leaves_q.pop(); parent_q.pop();
+                    TreeNode *leaf = find_leaf_node(root, target);
+                    q.front()->right->name = leaf->name;
+                    q.front()->right->value = leaf->value;
+
+                    // if (leaves_q.empty()) {cout<<"here is issue-2"<<endl;}
+                    // q.front()->right->name = leaves_q.front()->name;
+                    // q.front()->right->value = leaves_q.front()->value;
+                    // if (parent_q.front()->left == leaves_q.front()) {
+                    //     parent_q.front()->left = NULL;
+                    // }
+                    // else if (parent_q.front()->right == leaves_q.front()) {
+                    //     parent_q.front()->right = NULL;
+                    // }
+                    // else { cerr<<"buggy2"<<endl;}
+                    // leaves_q.pop(); parent_q.pop();
                     q.push(q.front()->right);
                 }
             }
