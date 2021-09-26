@@ -42,7 +42,7 @@ class Tree {
         int search(char target);
         vector<int> count_conditional_leaf_nonleaf(int target);
         void delete_node(char target);
-        Tree() {root = NULL;}
+        Tree() { root = NULL; }
     private:
         TreeNode *root;
         void preorder_print(TreeNode *ptr);
@@ -72,31 +72,34 @@ TreeNode *Tree::create_tree(vector<char> names, vector<int> values) {
         }
     }
 
-    queue<TreeNode *> new_q;
-    new_q.push(root);
-    TreeNode *tmp_ptr = NULL;
-    while (!new_q.empty()) {
-        TreeNode *q_front = new_q.front();
+    // replacing all -1's with NULL
+    if (root != NULL) {
+        queue<TreeNode *> new_q;
+        new_q.push(root);
+        TreeNode *tmp_ptr = NULL;
+        while (!new_q.empty()) {
+            TreeNode *q_front = new_q.front();
 
-        if (q_front->left != NULL) {
-            if (q_front->left->value == -1) {
-                tmp_ptr = q_front->left;
-                q_front->left = NULL;
-                delete tmp_ptr;
+            if (q_front->left != NULL) {
+                if (q_front->left->value == -1) {
+                    tmp_ptr = q_front->left;
+                    q_front->left = NULL;
+                    delete tmp_ptr;
+                }
+                else { new_q.push(q_front->left); }
             }
-            else { new_q.push(q_front->left); }
-        }
 
-        if (q_front->right != NULL) {
-            if (q_front->right->value == -1) {
-                tmp_ptr = q_front->right;
-                q_front->right = NULL;
-                delete tmp_ptr;
+            if (q_front->right != NULL) {
+                if (q_front->right->value == -1) {
+                    tmp_ptr = q_front->right;
+                    q_front->right = NULL;
+                    delete tmp_ptr;
+                }
+                else { new_q.push(q_front->right); }
             }
-            else { new_q.push(q_front->right); }
-        }
 
-        new_q.pop();
+            new_q.pop();
+        }
     }
     return root;
 };
@@ -147,9 +150,7 @@ void Tree::conditional_print(int target) {
 }
 
 void Tree::insert(TreeNode *node) {
-    if (root == NULL) {
-        cerr << "Some error in find_insert_location (inital)" << endl;
-    }
+    if (node == NULL) { return; }
 
     queue<TreeNode *> q;
     q.push(root);
@@ -165,6 +166,7 @@ void Tree::insert(TreeNode *node) {
 };
 
 int Tree::search(char target) {
+    if (root == NULL) { return 0; }
     int count = 0;
     search(root, target, &count);
     return count;
@@ -178,6 +180,7 @@ void Tree::search(TreeNode *ptr, char target, int *count) {
 }
 
 vector<int> Tree::count_conditional_leaf_nonleaf(int target) {
+    if (root == NULL) { return {0, 0}; }
     int leaf_count = 0, non_leaf_count = 0;
     count_conditional_leaf_nonleaf(root, target, &leaf_count, &non_leaf_count);
     return {leaf_count, non_leaf_count};
@@ -192,8 +195,7 @@ void Tree::count_conditional_leaf_nonleaf(TreeNode *ptr, int target, int *leaf_c
     count_conditional_leaf_nonleaf(ptr->right, target, leaf_count, non_leaf_count);
 }
 
-
-TreeNode *find_leaf_node(TreeNode *root, char target) {
+TreeNode *find_first_leaf_node(TreeNode *root, char target) {
     queue<TreeNode *> q;
     TreeNode *ptr;
 
@@ -203,6 +205,7 @@ TreeNode *find_leaf_node(TreeNode *root, char target) {
         if (ptr != NULL) {
             if (ptr->name != target && ptr->is_leaf()) {
                 ptr = q.front()->left;
+                // detach leaf node from tree
                 q.front()->left = NULL;
                 return ptr;
             }
@@ -212,6 +215,7 @@ TreeNode *find_leaf_node(TreeNode *root, char target) {
         if (ptr != NULL) {
             if (ptr->name != target && ptr->is_leaf()) {
                 ptr = q.front()->right;
+                // detach leaf node from tree
                 q.front()->right = NULL;
                 return ptr;
             }
@@ -219,17 +223,18 @@ TreeNode *find_leaf_node(TreeNode *root, char target) {
         }
         q.pop();
     }
-
-    cerr<<"no leaf node!!!"<<endl;
     return root;
 }
 
 void Tree::delete_node(char target) {
+    if (root == NULL) { return; }
+    if (root->name == target) {
+        root = NULL;
+        return;
+    }
+
     queue<TreeNode *> q;
     TreeNode *ptr;
-
-    // cout << "passing-1" << endl;
-    if ( !q.empty()) { cerr<<"P1: why q is not empty?"<<endl; }
 
     q.push(root);
     while (!q.empty()) {
@@ -241,18 +246,9 @@ void Tree::delete_node(char target) {
                     delete ptr;
                 }
                 else {                 
-                    // if (leaves_q.empty()) {cout<<"here is issue-1"<<endl;}
-                    TreeNode *leaf = find_leaf_node(root, target);
+                    TreeNode *leaf = find_first_leaf_node(root, target);
                     q.front()->left->name = leaf->name;
                     q.front()->left->value = leaf->value;
-                    // if (parent_q.front()->left == leaves_q.front()) {
-                    //     parent_q.front()->left = NULL;
-                    // }
-                    // else if (parent_q.front()->right == leaves_q.front()) {
-                    //     parent_q.front()->right = NULL;
-                    // }
-                    // else { cerr<<"buggy1"<<endl;}
-                    // leaves_q.pop(); parent_q.pop();
                     q.push(q.front()->left);
                 }
             }
@@ -266,21 +262,9 @@ void Tree::delete_node(char target) {
                     delete ptr;
                 }
                 else {
-                    TreeNode *leaf = find_leaf_node(root, target);
+                    TreeNode *leaf = find_first_leaf_node(root, target);
                     q.front()->right->name = leaf->name;
                     q.front()->right->value = leaf->value;
-
-                    // if (leaves_q.empty()) {cout<<"here is issue-2"<<endl;}
-                    // q.front()->right->name = leaves_q.front()->name;
-                    // q.front()->right->value = leaves_q.front()->value;
-                    // if (parent_q.front()->left == leaves_q.front()) {
-                    //     parent_q.front()->left = NULL;
-                    // }
-                    // else if (parent_q.front()->right == leaves_q.front()) {
-                    //     parent_q.front()->right = NULL;
-                    // }
-                    // else { cerr<<"buggy2"<<endl;}
-                    // leaves_q.pop(); parent_q.pop();
                     q.push(q.front()->right);
                 }
             }
@@ -288,39 +272,6 @@ void Tree::delete_node(char target) {
         }
         q.pop();
     }
-
-    // cout << "passing-3" << endl;
-    if (!q.empty()) { cerr<<"P2: why q is not empty?"<<endl; }
-
-    q.push(root);
-    while (!q.empty()) {
-        ptr = q.front()->left;
-        if (ptr != NULL) {
-            if (ptr->name == target) {
-                if (ptr->is_leaf()) {
-                    cerr << "bug1" << endl;
-                }
-                else {
-                    cerr << "bug2" << endl;
-                }
-            }
-            else { q.push(ptr); }
-        }
-        ptr = q.front()->right;
-        if (ptr != NULL) {
-            if (ptr->name == target) {
-                if (ptr->is_leaf()) {
-                    cerr << "bug3" << endl;
-                }
-                else {
-                    cerr << "bug4" << endl;
-                }
-            }
-            else { q.push(ptr); }
-        }
-        q.pop();
-    }
-
 }
 
 int main() {
@@ -332,7 +283,6 @@ int main() {
         int operation;
         cin >> operation;
         if (operation == 1) {
-            // cout << "FOR INSERTION" << endl;
             int n;
             cin >> n;
             vector<int> values(n, -1);
@@ -352,45 +302,36 @@ int main() {
             } else {
                 root = tree.create_tree(names, values);
             }
-            // cout << "################" << endl;
-            // tree.level_wise_print();
-            // cout << "####" << endl;
-            // tree.preorder_print();
-            // cout << "################" << endl;
         }
         if (operation == 2) {
-            // cout << "FOR DELETION" << endl;
             char target;
             cin >> target;
-            // cout << "###### BEFORE ########" << endl;
-            // tree.level_wise_print();
-            // cout << "################" << endl;
+            if (root == NULL) { continue; }
+            if (root->name == target) {
+                root = NULL;
+                continue;
+            }
             tree.delete_node(target);
-            // cout << "####### AFTER ########" << endl;
-            // tree.level_wise_print();
-            // cout << "################" << endl;
         }
         if (operation == 3) {
-            // cout << "FOR SEARCH" << endl;
             char target;
             cin >> target;
+            // if (root == NULL) { continue; }
             int count = tree.search(target);
             cout << count << endl;    
         }
         if (operation == 4) {
-            // cout << "FOR COUNTING LEAF/NON_LEAF" << endl;
             int target;
             cin >> target;
+            // if (root == NULL) { continue; }
             vector<int> count = tree.count_conditional_leaf_nonleaf(target);
             cout << count[0] << " " << count[1] << endl;    
         }
         if (operation == 5) {
-            // cout << "FOR PRINT" << endl;
             int target;
             cin >> target;
-            // cout << "target: " << target << endl;
+            if (root == NULL) { continue; }
             tree.conditional_print(target);
         }
     }
-    return 0;
 }
