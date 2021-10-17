@@ -19,10 +19,6 @@ class TreeNode {
             this->value = value;
             left = right = NULL;
         }
-
-        void print() {
-            cout << value << " ";
-        }
 };
 
 
@@ -86,37 +82,11 @@ void preorder_push(TreeNode *root, vector<int> &values) {
     values.push_back(root->value);
     preorder_push(root->left, values);
     preorder_push(root->right, values);
-};
-
-vector<int> preorder_push(TreeNode *root) {
-    vector<int> values;
-    preorder_push(root, values);
-    return values;
-}
-
-
-void level_wise_print(TreeNode *root) {
-    if (root == NULL) { return; }
-
-    queue<TreeNode *> q;
-    root->print(); q.push(root);
-
-    while (!q.empty()) {
-        TreeNode *q_front = q.front();
-
-        if (q_front->left != NULL) {
-            q_front->left->print(); q.push(q_front->left);
-        }
-        if (q_front->right != NULL) {
-            q_front->right->print(); q.push(q_front->right);
-        }
-        q.pop();
-    }
 }
 
 bool compare_fn(vector<int> vec1, vector<int> vec2) {
-    if (vec1[0] == vec2[0] && vec1[1] < vec2[1]) {
-        return true;
+    if (vec1[0] == vec2[0]) {
+        return vec1[1] < vec2[1];
     }
     return vec1[0] < vec2[0];
 }
@@ -130,10 +100,14 @@ void rearrange_and_print(vector< vector<int> > &pairs) {
         }
     }
 
-    sort(pairs.begin(), pairs.end()++, compare_fn);
+    sort(pairs.begin(), pairs.end(), compare_fn);
 
+    int l = 0, r = 0;
     for (int i = 0; i < size; i++) {
+        if (l == pairs[i][0] && r == pairs[i][1]) { continue; }
         cout << pairs[i][0] << " " << pairs[i][1] << endl;
+        l = pairs[i][0];
+        r = pairs[i][1];
     }
 }
 
@@ -151,7 +125,10 @@ void print_pairs_with_target_sum(vector<int> values, int target) {
         if (umap.find(diff) != umap.end() && umap.find(values[i]) != umap.end()) {
             for (int i1 : umap[values[i]]) {
                 for (int i2 : umap[diff]) {
-                    pairs.push_back({i1, i2});
+                    vector<int> pair = {i1, i2};
+                    if (i1 != i2) {
+                        pairs.push_back(pair);
+                    }
                 }
             }
             umap.erase(diff);
@@ -167,6 +144,7 @@ void print_pairs_with_target_sum(vector<int> values, int target) {
     }
 }
 
+
 int main() {
     int target, val;
     vector<int> values;
@@ -175,8 +153,9 @@ int main() {
     while (cin >> val) { values.push_back(val); }
 
     TreeNode *root = create_tree(values);
-    // level_wise_print(root); cout << endl;
 
-    vector<int> preorderd_values = preorder_push(root);
+    vector<int> preorderd_values;
+    preorder_push(root, preorderd_values);
+
     print_pairs_with_target_sum(preorderd_values, target);
 }
