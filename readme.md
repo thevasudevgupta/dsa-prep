@@ -3,7 +3,7 @@
 * [x] [NPTEL DSA YouTube](https://www.youtube.com/playlist?app=desktop&list=PLyqSpQzTE6M_Fu6l8irVwXkUyC9Gwqr6_)
 * [x] [CS2700 course page](https://www.cse.iitm.ac.in/~rupesh/teaching/pds/aug21/)
 * [ ] [CS2800](http://www.cse.iitm.ac.in/~shwetaag/CS2800-22.htm)
-* [ ] [algoexpert.io](https://www.algoexpert.io/product)
+* [x] [algoexpert.io](https://www.algoexpert.io/product)
 * [ ] [CS2810 course page](https://www.cse.iitm.ac.in/~rupesh/teaching/ooaia/jan20/)
 
 ### CS2700 assignments
